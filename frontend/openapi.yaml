@@ -1,0 +1,527 @@
+openapi: 3.0.0
+info:
+  title: RecipesApp - Noa & Inbal
+  version: 1.0.1-oas3
+servers:
+- url: http://localhost:3000
+paths:
+  /register:
+    post:
+      summary: add new user to database
+      description: add new user member to database
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        "201":
+          description: New user created successfully
+        "400":
+          description: Trying to access a path that does not exist on the server
+        "401":
+          description: Authentication is required before accessing the server
+        "409":
+          description: A username already exists in the system
+        "500":
+          description: An error occurred on the server
+  /login:
+    post:
+      summary: Log user
+      description: user Login to the system
+      operationId: loginUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body'
+        required: true
+      responses:
+        "200":
+          description: successful operation- user exist and password match
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+        "400":
+          description: Trying to access a path that does not exist on the server
+        "401":
+          description: User Authentication Failed - Username or password is incorrect
+        "500":
+          description: An error occurred on the server
+  /logout:
+    post:
+      tags:
+      - user
+      summary: Logs out
+      description: Log out of the current logged in user
+      operationId: logoutUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body_1'
+        required: true
+      responses:
+        "200":
+          description: successful Log out
+        "400":
+          description: Trying to access a path that does not exist on the server
+        "500":
+          description: An error occurred on the server
+  /api/searchRecipe:
+    get:
+      tags:
+      - api
+      summary: Search Recipe
+      description: We can search recipe - by recipe name, by food name, by filtering
+      operationId: searchRecipe
+      parameters:
+      - name: userId
+        in: query
+        description: user Id
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: query
+        in: query
+        description: recipeName/foodName
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: number
+        in: query
+        description: number of return recipes - 5/10/15 recipies
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          default: 5
+          enum:
+          - 5
+          - 10
+          - 15
+      - name: cuisines
+        in: query
+        description: if we want to filter the results by this option - can be empty
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: diet
+        in: query
+        description: if we want to filter the results by this option - can be empty
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: intolerence
+        in: query
+        description: if we want to filter the results by this option - can be empty
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/inline_response_200_1'
+        "400":
+          description: query paramater is missing
+        "500":
+          description: An error occurred on the server
+  /api/getRandomize:
+    get:
+      tags:
+      - api
+      summary: randomize recipes
+      description: Returns 3 random recipes
+      operationId: randomize recipes
+      parameters:
+      - name: userId
+        in: query
+        description: user Id
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/inline_response_200_1'
+        "400":
+          description: Trying to access a path that does not exist on the server
+        "500":
+          description: An error occurred on the server
+  /user/getLaFamiliaRecipe:
+    get:
+      tags:
+      - user
+      summary: get family recepies
+      description: get all the family recipes that have a user. This can only be done
+        by the logged in user.
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FamilyRecipe'
+        "400":
+          description: Trying to access a path that does not exist on the server
+        "401":
+          description: Authentication is required before accessing the server
+        "500":
+          description: An error occurred on the server
+  /user/getPersonalRecipe:
+    get:
+      tags:
+      - user
+      summary: get user personals recepies
+      description: get all the personal recipes that the user create. This can only
+        be done by the logged in user.
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipe'
+        "400":
+          description: Trying to access a path that does not exist on the server
+        "401":
+          description: Authentication is required before accessing the server
+        "500":
+          description: An error occurred on the server
+  /user/getLastWatchRecipe:
+    get:
+      tags:
+      - user
+      summary: last Views Recipes
+      description: get the 3 last viewed recipes by the user that log in to the system.
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/inline_response_200_1'
+        "400":
+          description: Trying to access a path that does not exist on the server
+        "401":
+          description: Authentication is required before accessing the server
+        "500":
+          description: An error occurred on the server
+  /user/getFavoriteRecipe:
+    get:
+      tags:
+      - user
+      summary: get favorite recepies
+      description: get all the favorits recipes that have a user.This can only be
+        done by the logged in user.
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/inline_response_200_1'
+        "400":
+          description: Trying to access a path that does not exist on the server
+        "401":
+          description: Authentication is required before accessing the server
+        "500":
+          description: An error occurred on the server
+  /user/addFavoriteRecipe:
+    post:
+      tags:
+      - user
+      summary: Add to favorites
+      description: Add the choosen recipe to the favorits recipes of the logged in
+        user.
+      operationId: AddToFavorites
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body_2'
+        required: true
+      responses:
+        "200":
+          description: Recipe Added To Favorites
+        "400":
+          description: Trying to access a path that does not exist on the server
+        "401":
+          description: Authentication is required before accessing the server
+        "500":
+          description: An error occurred on the server
+  /user/userWatchRecipe:
+    post:
+      tags:
+      - user
+      summary: watched Recipe
+      description: add recipe to watched list of the user
+      operationId: watchedRecipe
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body_3'
+        required: true
+      responses:
+        "200":
+          description: recipe added to watched list
+        "400":
+          description: Trying to access a path that does not exist on the server
+        "401":
+          description: Authentication is required before accessing the server
+        "500":
+          description: An error occurred on the server
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        username:
+          maxLength: 8
+          minLength: 3
+          pattern: ^[a-zA-Z]+$
+          type: string
+          example: QueenB
+        firstName:
+          type: string
+          example: Beyonce
+        lastName:
+          type: string
+          example: Carter
+        country:
+          type: string
+          description: values from here 'https://restcountries.eu/rest/v2/all'
+          example: Israel
+        password:
+          maxLength: 10
+          minLength: 5
+          type: string
+          format: password
+          example: blaa!3
+        confirmationPassword:
+          maxLength: 10
+          minLength: 5
+          type: string
+          format: password
+          example: blaa!3
+        email:
+          pattern: email
+          type: string
+          example: Beyonce@post.bgu.ac.il
+        image:
+          pattern: URL
+          type: string
+          description: from here 'https://cloudinary.com/'
+          example: https://images.app.goo.gl/c8UWFG9iMyLGokvY8
+    Ingredient:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 123
+        original:
+          type: string
+          example: 0.5 glass of olive oil
+    Recipe:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 134
+        Name:
+          type: string
+          example: Omelette
+        imageLink:
+          pattern: URL
+          type: string
+          description: from here 'https://cloudinary.com/'
+          example: https://images.app.goo.gl/JWe4ZAxQd6VmzU227
+        timeMinutes:
+          type: string
+          example: 10 minutes
+        servings:
+          type: integer
+          example: 1
+        likes:
+          type: integer
+          example: 12548
+        vegan:
+          type: boolean
+          example: false
+        vegetarian:
+          type: boolean
+          example: true
+        glutenFree:
+          type: boolean
+          example: false
+        saved:
+          type: boolean
+          example: false
+        watched:
+          type: boolean
+          example: true
+        ingridiantsList:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ingredient'
+        Instructions:
+          $ref: '#/components/schemas/Recipe_Instructions'
+    Step:
+      type: object
+      properties:
+        number:
+          type: integer
+          example: 1
+        step:
+          type: string
+          example: put the oil into the pot
+    FamilyRecipe:
+      type: object
+      properties:
+        RecipeOwner:
+          type: string
+          example: grandmother Beyonce
+        RecipePeriod:
+          type: string
+          example: During Passover Holiday
+        photos:
+          type: array
+          example:
+          - https://images.app.goo.gl/9d7uBhLXmbgbw5uN8
+          - https://images.app.goo.gl/G6Gia9zad4jzTMm4A
+          items:
+            pattern: URL
+            type: string
+            description: from here 'https://cloudinary.com/'
+        Recipe:
+          $ref: '#/components/schemas/Recipe'
+    WatchedRecipes:
+      type: object
+      properties:
+        User_Id:
+          type: string
+        Recipe_Id:
+          type: integer
+        Watched_Date:
+          type: string
+    SavedRecipes:
+      type: object
+      properties:
+        User_Id:
+          type: string
+        Recipe_Id:
+          type: integer
+    PersonalRecipes:
+      type: object
+      properties:
+        User_Id:
+          type: string
+        Recipe_Id:
+          type: string
+    UserSavedItems:
+      type: object
+      properties:
+        user_Id:
+          type: string
+        watchRecipes:
+          type: array
+          items:
+            $ref: '#/components/schemas/WatchedRecipes'
+        favoriteRecipes:
+          type: array
+          items:
+            $ref: '#/components/schemas/SavedRecipes'
+        UserRecipes:
+          type: array
+          items:
+            $ref: '#/components/schemas/PersonalRecipes'
+        userFamilyRecipes:
+          type: array
+          example:
+          - 11
+          - 16
+          items:
+            type: integer
+    body:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    inline_response_200:
+      type: object
+      properties:
+        userName:
+          type: string
+        userId:
+          type: string
+        profileImg:
+          type: string
+    body_1:
+      type: object
+      properties:
+        userId:
+          type: string
+    inline_response_200_1:
+      type: object
+      properties:
+        recipe:
+          $ref: '#/components/schemas/Recipe'
+    body_2:
+      type: object
+      properties:
+        userId:
+          type: string
+        recipeId:
+          type: integer
+    body_3:
+      type: object
+      properties:
+        userId:
+          type: string
+        recipeId:
+          type: integer
+    Recipe_Instructions:
+      type: object
+      properties:
+        name:
+          type: string
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/Step'
